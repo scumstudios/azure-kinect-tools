@@ -1,4 +1,4 @@
-# Azure Kinect Volumetric Capture Wiki
+# Scum Studios' Azure Kinect Volumetric Tools
 A place for our research project to collect information regaring Azure Kinect volumetric capture.
 
 

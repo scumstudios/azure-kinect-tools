@@ -1,8 +1,16 @@
-# Scum Studios' Azure Kinect Volumetric Tools
-A place for our research project to collect information regaring Azure Kinect volumetric capture.
+# Scum Studios Azure Kinect Volumetric Tools
+
+A set of tools to record and process point clouds from multiple Azure Kinect cameras.
+
+## Prerequisites (Installation instructions below)
+
+- Ubuntu 20.04, 22.04 or derivatives. Our test environment is Linux Mint 20.3.
+- Azure Kinect SDK
+- Python 3.8 or higher
+- Python Open3D library
 
 
-## Azure Kinect SDK Linux Installation & Configuration
+### Azure Kinect SDK Linux Installation & Configuration
 
 Ubuntu 20.04 & Derivatives:
 
@@ -15,25 +23,13 @@ Direct links to 18.04 .deb (can be installed on 20.04):
 
 Copy '99-k4a.rules' into '/etc/udev/rules.d/' to access the cameras as non-root user. [Reference Azure Kinect SDK](https://github.com/microsoft/Azure-Kinect-Sensor-SDK/blob/develop/docs/usage.md#linux-device-setup)
 
+For Ubuntu 22.04, libsoundio1 is no longer in the repos and is required for the K4A SDK, you can install the [.deb from 20.04](http://archive.ubuntu.com/ubuntu/pool/universe/libs/libsoundio/libsoundio1_1.1.0-1_amd64.deb) first at your own risk.
 
 
-## Relevant software
+### Python Open3D
 
-Open Source Projects:
+Open3D can be installed through the Python package manager (pip).
 
-Python Wrappers
+Install pip: ```sudo apt install python3-pip```
 
-- [PyKinect Azure](https://github.com/ibaiGorordo/pyKinectAzure) can be installed through pip: ```pip install pykinect_azure```
-- [pyk4a](https://github.com/etiennedub/pyk4a)
-- [Azure Kinect Python](https://github.com/hexops/Azure-Kinect-Python/blob/master/example/simple_sample.py)
-
-.NET Wrapper
-
-- [k4a.net](https://github.com/bibigone/k4a.net/releases)
-
-
-Commercial Solutions:
-
-- [Brekel Pointcloud](https://brekel.com/brekel-pointcloud-v3/)
-- [Depthkit](https://www.depthkit.tv/)
-- EF EVE (discontinued)
+Install Open3D: ```pip install open3d```

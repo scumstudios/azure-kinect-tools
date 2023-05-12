@@ -19,12 +19,12 @@ readline.parse_and_bind("tab: complete")
 #videopath = input("Path to Kinect recordings: ")
 videopath = ("/mnt/data/00-RECORD/")
 
-#create MKVReader class
-reader = o3d.io.AzureKinectMKVReader()
-
 for video in os.listdir(videopath):
 
-    print(reader)
+    #create MKVReader class
+    reader = o3d.io.AzureKinectMKVReader()
+
+    #print(reader)
     print("Processing: " + video)
 
     #Load in MKV file
@@ -35,24 +35,36 @@ for video in os.listdir(videopath):
     o3d.io.write_azure_kinect_mkv_metadata("/tmp/intrinsic.json", meta)
 
     i = 1
+    j = 0
 
     #Read next frame and extract RGBD
-    reader.seek_timestamp(100)
+    reader.seek_timestamp(100000)
 
     #Extract MKV Frames and create plys
     while reader.is_eof != True:
 
         #Read next frame and extract RGBD
         frame = reader.next_frame()
+               
+        if frame == None:
+            j += 1
+
+            print("EMPTY FRAME " + str(j))
+            
+            i += 1
+
+            if j > 50:
+                break
+
         
-        if frame != None:
+        else: 
 
             #Create O3D Images
             rgb = o3d.geometry.Image(np.asarray(frame.color))
             depth = o3d.geometry.Image(np.asarray(frame.depth))
 
             #Combine Channels in to O3D RDGBImage and set correct depth
-            rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(rgb, depth, depth_scale=1000, depth_trunc=100, convert_rgb_to_intensity=False)
+            rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(rgb, depth, depth_scale=1000, depth_trunc=3, convert_rgb_to_intensity=False)
 
             #Read generated intrinsic
             cam = o3d.io.read_pinhole_camera_intrinsic("/tmp/intrinsic.json")
@@ -61,10 +73,6 @@ for video in os.listdir(videopath):
             pcd = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd, cam)
 
             # #Write point cloud to ply
-            o3d.io.write_point_cloud("/tmp/" + video + str(i).zfill(4) +".ply", pcd)
+            o3d.io.write_point_cloud("/tmp/ply/" + video + "_" + str(i).zfill(4) +".ply", pcd, compressed=True)
 
             i += 1
-        
-        else: 
-            print(video + "processed!")
-            break

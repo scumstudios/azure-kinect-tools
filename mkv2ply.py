@@ -13,6 +13,8 @@ import open3d as o3d
 import cv2 as cv
 import numpy as np
 
+point_output = 15000
+
 readline.parse_and_bind("tab: complete")
 
 #get recordings path ## TODO: Fix TRAILING slash detection
@@ -38,10 +40,11 @@ for video in os.listdir(videopath):
     j = 0
 
     #Read next frame and extract RGBD
-    reader.seek_timestamp(100000)
+    reader.seek_timestamp(10000000)
 
     #Extract MKV Frames and create plys
     while reader.is_eof != True:
+    #for x in range(150):
 
         #Read next frame and extract RGBD
         frame = reader.next_frame()
@@ -53,7 +56,7 @@ for video in os.listdir(videopath):
             
             i += 1
 
-            if j > 50:
+            if j > 5:
                 break
 
         
@@ -64,15 +67,26 @@ for video in os.listdir(videopath):
             depth = o3d.geometry.Image(np.asarray(frame.depth))
 
             #Combine Channels in to O3D RDGBImage and set correct depth
-            rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(rgb, depth, depth_scale=1000, depth_trunc=3, convert_rgb_to_intensity=False)
+            rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(rgb, depth, depth_scale=1000, depth_trunc=1.0, convert_rgb_to_intensity=False)
 
             #Read generated intrinsic
             cam = o3d.io.read_pinhole_camera_intrinsic("/tmp/intrinsic.json")
 
             # #Create point cloud
             pcd = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd, cam)
+            #pcdg = o3d.t.geometry.PointCloud.from_legacy(pcd)
+            
+            #Filter point cloud
+            pcd, ind = pcdg.remove_statistical_outlier(nb_neighbors=8, std_ratio=0.33, print_progress=False)
+            #pcd = pcd.voxel_down_sample(0.001)
+            
+            if len(pcd.points) < point_output:
+                break
+            else:
+                
+                pcd = pcd.farthest_point_down_sample(point_output)
 
-            # #Write point cloud to ply
-            o3d.io.write_point_cloud("/tmp/ply/" + video + "_" + str(i).zfill(4) +".ply", pcd, compressed=True)
+                # #Write point cloud to ply
+                o3d.io.write_point_cloud("/mnt/data/10-POINTCLOUDS/000-ply/" + video + "_" + str(i).zfill(4) +".ply", pcd, compressed=True)
 
-            i += 1
+                i += 1

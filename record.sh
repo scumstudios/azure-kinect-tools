@@ -71,10 +71,10 @@ for i in "${cam_rec[@]}";
     do       
         if [ $i != $index_master ]; then
             printf "Subordinate with index $i start with depth $depth_res\n"
-            tilix -e k4arecorder --device $i --exposure-control "$exposure" --external-sync sub --imu OFF -c $color_res -d "$depth_res" -r $framerate "$output_dir""$timestamp"_sub_$i.mkv
+            xterm -e k4arecorder --device $i --exposure-control "$exposure" --external-sync sub --sync-delay 0 --imu OFF -c $color_res -d "$depth_res" -r $framerate --record-length 10 "$output_dir""$timestamp"_$i.mkv
             sleep 2
         fi
     done
     
 printf "Master with index $i start with depth $depth_res\n"
-tilix -e k4arecorder --device $i --exposure-control "$exposure" --external-sync master --imu OFF -c $color_res -d "$depth_res" -r $framerate "$output_dir""$timestamp"_master_$i.mkv
+xterm -e k4arecorder --device $i --exposure-control "$exposure" --external-sync master --imu OFF -c $color_res -d "$depth_res" -r $framerate --record-length 10 "$output_dir""$timestamp"_$i.mkv

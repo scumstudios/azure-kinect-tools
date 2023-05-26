@@ -32,7 +32,8 @@ Open3D can be installed through the Python package manager (pip).
 
 Install pip: ```sudo apt install python3-pip```
 
-Install Open3D: ```pip install open3d```
+Install Open3D: ```pip install open3d``` (Make sure Open3D is version 0.17 or later)
+To ensure compatibility it's best to install Open3D 0.17 by running ```pip install --trusted-host www.open3d.org -f https://storage.googleapis.com/open3d-releases-master/python-wheels/open3d-0.17.0-cp38-cp38-manylinux_2_27_x86_64.whl open3d```
 
 Additionally, the ```python-is-python3``` package can be installed on older versions of Ubuntu if you would like your ```python``` command to default to python3. Do so at your own risk.
 

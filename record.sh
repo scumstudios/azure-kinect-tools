@@ -53,6 +53,12 @@ esac
 printf "Exposure (-11 to 1): "
 read exposure
 
+printf "Recording Time in Seconds: "
+read rec_len
+
+printf "Press Return to start recording"
+
+
 for i in "${cameras[@]}";
     do
         # Extract index number from list
@@ -71,10 +77,10 @@ for i in "${cam_rec[@]}";
     do       
         if [ $i != $index_master ]; then
             printf "Subordinate with index $i start with depth $depth_res\n"
-            xterm -e k4arecorder --device $i --exposure-control "$exposure" --external-sync sub --sync-delay 0 --imu OFF -c $color_res -d "$depth_res" -r $framerate --record-length 10 "$output_dir""$timestamp"_$i.mkv
+            tilix -e k4arecorder --device $i --exposure-control "$exposure" --external-sync sub --sync-delay 0 --imu OFF -c $color_res -d "$depth_res" -r $framerate --record-length $rec_len "$output_dir""$timestamp"_$i.mkv
             sleep 2
         fi
     done
     
 printf "Master with index $i start with depth $depth_res\n"
-xterm -e k4arecorder --device $i --exposure-control "$exposure" --external-sync master --imu OFF -c $color_res -d "$depth_res" -r $framerate --record-length 10 "$output_dir""$timestamp"_$i.mkv
+tilix -e k4arecorder --device $i --exposure-control "$exposure" --external-sync master --imu OFF -c $color_res -d "$depth_res" -r $framerate --record-length $rec_len "$output_dir""$timestamp"_$i.mkv

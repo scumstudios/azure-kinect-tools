@@ -45,7 +45,7 @@ Additionally, the ```python-is-python3``` package can be installed on older vers
 
 Shell script that uses the "k4arecorder" from the K4A Tools to automate the recording of multiple synchronized video & depth streams.
 Run the script and follow along with the steps to start the recording. Assumes multiple Azure Kinects synced with sync cables.
-Change the ```xterm``` exec to whichever terminal emulator you prefer to spawn the recording threads.
+Change the ```tilix``` exec to whichever terminal emulator you prefer to spawn the recording threads.
 
 #### mkv2ply.py (step 2: conversion)
 

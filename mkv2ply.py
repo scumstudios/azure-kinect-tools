@@ -14,7 +14,9 @@ point_output = float(input("Fixed Point Output (0 to Disable): "))
 
 pc_path = input("Point Cloud Output Directory: ")
 
-for video in os.listdir(rec_path):
+
+#Define conversion function:
+def pc_gen(video):
 
     #create MKVReader class
     reader = o3d.io.AzureKinectMKVReader()
@@ -62,9 +64,11 @@ for video in os.listdir(rec_path):
 
             #Combine Channels in to O3D RDGBImage and set correct depth
             if depth_trunc == 0:
-                depth_trunc = 1000
+                depth_fix = 1000
+            else:
+                depth_fix = depth_trunc
 
-            rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(rgb, depth, depth_scale=1000, depth_trunc=depth_trunc, convert_rgb_to_intensity=False)
+            rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(rgb, depth, depth_scale=1000, depth_trunc=depth_fix, convert_rgb_to_intensity=False)
 
             #Read generated intrinsic
             cam = o3d.io.read_pinhole_camera_intrinsic("/tmp/intrinsic.json")
@@ -83,21 +87,25 @@ for video in os.listdir(rec_path):
             if point_output != 0:
             
                 #Check to see if point cloud has less points than final output
-                point_output = int(point_output)
+                point_fix = int(point_output)
 
-                if len(pcd.points) < point_output:
+                if len(pcd.points) < point_fix:
                     break
                 else:
-                    pcd = pcd.farthest_point_down_sample(point_output)
+                    pcd = pcd.farthest_point_down_sample(point_fix)
 
                 # #Write point cloud to ply
-                o3d.io.write_point_cloud(pc_path + video + "_" + str(i).zfill(4) +".ply", pcd, compressed=True)
+                o3d.io.write_point_cloud(pc_path + str(video).rstrip(".mkv") + "_" + str(i).zfill(4) +".ply", pcd, compressed=True)
 
                 i += 1
 
             else:
 
                 #Write point cloud to ply
-                o3d.io.write_point_cloud(pc_path + video + "_" + str(i).zfill(4) +".ply", pcd, compressed=True)
+                o3d.io.write_point_cloud(pc_path + str(video).rstrip(".mkv") + "_" + str(i).zfill(4) +".ply", pcd, compressed=True)
 
                 i += 1
+
+for video in os.listdir(rec_path):
+    if str(video.endswith('.mkv')):
+        pc_gen(video)

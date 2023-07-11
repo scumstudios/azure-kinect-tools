@@ -29,9 +29,9 @@ def pc_gen(video):
 
     #Read metadata and write to json
     meta = reader.get_metadata()
-    o3d.io.write_azure_kinect_mkv_metadata("/tmp/intrinsic.json", meta)
+    o3d.io.write_azure_kinect_mkv_metadata("/tmp/" + video + ".json", meta)
 
-    i = 1
+    i = 0
     j = 0
 
     #Read next frame and extract RGBD
@@ -44,7 +44,7 @@ def pc_gen(video):
         #Read next frame and extract RGBD
         frame = reader.next_frame()
 
-        #Move on to next file if no frames can be read 
+        #Move on to next file if three consecutive frames can't be read 
         if frame == None:
             j += 1
 
@@ -52,11 +52,13 @@ def pc_gen(video):
             
             i += 1
 
-            if j > 5:
+            if j > 2:
                 break
 
         
         else: 
+
+            i += 1
 
             #Create O3D Images
             rgb = o3d.geometry.Image(np.asarray(frame.color))
@@ -71,7 +73,7 @@ def pc_gen(video):
             rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(rgb, depth, depth_scale=1000, depth_trunc=depth_fix, convert_rgb_to_intensity=False)
 
             #Read generated intrinsic
-            cam = o3d.io.read_pinhole_camera_intrinsic("/tmp/intrinsic.json")
+            cam = o3d.io.read_pinhole_camera_intrinsic("/tmp/" + video + ".json")
 
             #Create point cloud
             pcd = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd, cam)
@@ -94,18 +96,60 @@ def pc_gen(video):
                 else:
                     pcd = pcd.farthest_point_down_sample(point_fix)
 
-                # #Write point cloud to ply
-                o3d.io.write_point_cloud(pc_path + str(video).rstrip(".mkv") + "_" + str(i).zfill(4) +".ply", pcd, compressed=True)
+        #Write point cloud to ply
+        o3d.io.write_point_cloud(pc_path + str(video).rstrip(".mkv") + "_" + str(i).zfill(4) +".ply", pcd, compressed=True)
 
-                i += 1
-
-            else:
-
-                #Write point cloud to ply
-                o3d.io.write_point_cloud(pc_path + str(video).rstrip(".mkv") + "_" + str(i).zfill(4) +".ply", pcd, compressed=True)
-
-                i += 1
+### SERIAL PROCESSING ###
 
 for video in os.listdir(rec_path):
     if str(video.endswith('.mkv')):
         pc_gen(video)
+
+
+
+
+### PARALLEL PROCESSING RANDOM ###
+
+# videos = os.listdir(rec_path)
+
+# from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+# with ThreadPoolExecutor() as executor:
+#     results = executor.map(pc_gen, [video for video in videos])
+
+### PARALLEL PROCESSING ###
+
+# videos = os.listdir(rec_path)
+
+# from multiprocessing import Process
+
+# p = Process(target=pc_gen, args=[video for video in videos])
+# p.start()
+# p.join()
+
+
+#####
+
+
+# import threading
+
+# videos = os.listdir(rec_path)
+
+# for v in videos:
+#     t=threading.Thread(target=pc_gen, args=(v, ))
+#     t.start()
+
+
+#######
+
+
+# thread_list = []
+
+# for video in videos:
+#     t = threading.Thread(target=pc_gen, args=video)
+#     thread_list.append(t)
+
+# for thread in thread_list:
+#     thread.start()
+
+# for thread in thread_list:
+#     thread.join()
